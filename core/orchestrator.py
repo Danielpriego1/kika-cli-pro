@@ -7,7 +7,7 @@ import sys
 class KikaOrchestrator:
     def __init__(self):
         self.vps_ip = "85.239.241.120"
-        self.gentle_ai_bin = "/home/dani/go/bin/gentle-ai"
+        self.kika_ai_bin = "/home/dani/go/bin/kika-ai"
         self.engram_bin = "/home/dani/go/bin/engram"
         print(f"🛡️ Kika Core Initialized on VPS: {self.vps_ip}")
 
@@ -34,10 +34,10 @@ class KikaOrchestrator:
             return f"Error guardando memoria: {str(e)}"
 
     def list_agents(self):
-        """Lista los adaptadores y agentes soportados por Gentle-AI"""
+        """Lista los adaptadores y agentes soportados por Kika-AI"""
         try:
             result = subprocess.run(
-                [self.gentle_ai_bin, "doctor"],
+                [self.kika_ai_bin, "doctor"],
                 capture_output=True, text=True, check=True
             )
             return result.stdout.strip()
@@ -46,5 +46,5 @@ class KikaOrchestrator:
 
 if __name__ == "__main__":
     kika = KikaOrchestrator()
-    print("--- Estado del Sistema Gentle-AI ---")
+    print("--- Estado del Sistema Kika-AI ---")
     print(kika.list_agents())
