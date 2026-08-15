@@ -1,0 +1,44 @@
+================================================================================
+                    ARQUITECTURA KIKA CLI PRO: ORQUESTACIÓN TOTAL
+================================================================================
+
+      [ CELULAR / IPHONE ] <---- Blink Tunnel ----> [ VPS 2 (CEREBRO): 85.239.241.120 ]
+                                                          |
+                                                          v
++------------------------------------------------------------------------------+
+|                          KIKA ORCHESTRATOR (CORE)                            |
+|          (Razonamiento, Planificación y Validación de Acciones)              |
++-----------------------+-------------------------------+----------------------+
+                        |                               |
+                        v                               v
+          +---------------------------+   +---------------------------+
+          |  MEMORIA SEMÁNTICA (RAG)  |   |   MOTOR DE ACCIÓN (BIN)   |
+          |          ENGRAM           |   |         GENTLE-AI         |
+          | (SQLite + Vector Database)|   | (Orquestador de Adaptadores)|
+          +---------------------------+   +---------------------------+
+                        |                               |
+                        |            +------------------+------------------+
+                        |            |                                     |
+                        v            v                                     v
+          +---------------------------+             +---------------------------+
+          |   HISTORIAL DE ÉXITOS     |             |  EJÉRCITO DE 22 AGENTES   |
+          |   LOGS DE TERMINAL        |             |  (Claude, Pi, OpenCode,   |
+          |   ADN DE CODEX CLI        |             |   Codex, Gemini, etc.)    |
+          +---------------------------+             +---------------------------+
+                                                            |
+                                                            v
+                                            +---------------------------+
+                                            |   REPOSITORIO DE SKILLS   |
+                                            | (Nginx, Docker, React, etc)|
+                                            +---------------------------+
+                                                            |
+                                                            v
+                                            [ VPS 1: PRODUCCIÓN / APPS ]
+                                            (PSI Web, App, Juego, Flowy)
+
+================================================================================
+ PRINCIPALES CAPACIDADES:
+ 1. Auto-Sanación: Monitoreo y reinicio automático de servicios.
+ 2. Despliegue Continuo: Actualización de apps y web sin intervención humana.
+ 3. Memoria Infinita: Kika aprende de cada error y cada éxito.
+================================================================================
