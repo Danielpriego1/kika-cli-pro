@@ -1,0 +1,51 @@
+{
+  "version": 3,
+  "skills": {
+    "insforge": {
+      "source": "insforge/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/insforge/agent-skills.git",
+      "skillPath": "skills/insforge/SKILL.md",
+      "skillFolderHash": "512d73deb320d80e12183618dee376e91d2476ba",
+      "installedAt": "2026-08-15T15:54:08.011Z",
+      "updatedAt": "2026-08-15T15:54:08.011Z"
+    },
+    "insforge-cli": {
+      "source": "insforge/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/insforge/agent-skills.git",
+      "skillPath": "skills/insforge-cli/SKILL.md",
+      "skillFolderHash": "967eb2ef0dfc6c735fe603205cfe226656288f76",
+      "installedAt": "2026-08-15T15:54:08.020Z",
+      "updatedAt": "2026-08-15T15:54:08.020Z"
+    },
+    "insforge-debug": {
+      "source": "insforge/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/insforge/agent-skills.git",
+      "skillPath": "skills/insforge-debug/SKILL.md",
+      "skillFolderHash": "d869861926ee81db6efb0acbf2f8eab5c9831bba",
+      "installedAt": "2026-08-15T15:54:08.024Z",
+      "updatedAt": "2026-08-15T15:54:08.024Z"
+    },
+    "insforge-integrations": {
+      "source": "insforge/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/insforge/agent-skills.git",
+      "skillPath": "skills/insforge-integrations/SKILL.md",
+      "skillFolderHash": "9f753126bc84a457d4ac8b0e7e5c86213ee2c8e2",
+      "installedAt": "2026-08-15T15:54:08.029Z",
+      "updatedAt": "2026-08-15T15:54:08.029Z"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/skills.git",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "skillFolderHash": "76a98a285cb0434f3d39e1a873823556330e398b",
+      "installedAt": "2026-08-15T15:54:09.688Z",
+      "updatedAt": "2026-08-15T15:54:09.688Z"
+    }
+  },
+  "dismissed": {}
+}

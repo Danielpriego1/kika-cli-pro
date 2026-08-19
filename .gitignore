@@ -10,3 +10,4 @@ __pycache__/
 # Secretos y configuraciones locales
 .env
 *.env
+config/private/
