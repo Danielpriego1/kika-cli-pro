@@ -1,0 +1,184 @@
+{
+  "schema_version": "1.0",
+  "orchestrator": "kika-ai",
+  "project": "kika-cli-pro",
+  "description": "Registro operativo de los 22 perfiles especializados coordinados por Kika-AI.",
+  "agents": [
+    {
+      "id": "kika-coordinator",
+      "name": "Kika Coordinadora",
+      "runtime": "opencode",
+      "role": "Descompone objetivos, asigna especialistas, sintetiza resultados y exige verificación antes de concluir.",
+      "capabilities": ["orquestacion", "priorizacion", "sintesis"],
+      "requires_approval": ["destructive_action", "external_publish", "credential_change"]
+    },
+    {
+      "id": "pi-reasoner",
+      "name": "Pi Razonadora",
+      "runtime": "pi",
+      "role": "Analiza decisiones técnicas complejas, alternativas, riesgos y planes de ejecución.",
+      "capabilities": ["razonamiento", "arquitectura", "revision"],
+      "requires_approval": ["destructive_action", "external_publish"]
+    },
+    {
+      "id": "gga-planner",
+      "name": "GGA Planificadora",
+      "runtime": "gga",
+      "role": "Convierte objetivos en planes verificables, dependencias y criterios de aceptación.",
+      "capabilities": ["planificacion", "descomposicion", "seguimiento"],
+      "requires_approval": ["external_publish"]
+    },
+    {
+      "id": "opencode-builder",
+      "name": "OpenCode Constructora",
+      "runtime": "opencode",
+      "role": "Implementa cambios de código acotados, pruebas y correcciones reproducibles.",
+      "capabilities": ["codigo", "refactorizacion", "pruebas"],
+      "requires_approval": ["destructive_action", "production_deploy"]
+    },
+    {
+      "id": "engram-librarian",
+      "name": "Engram Archivista",
+      "runtime": "engram",
+      "role": "Guarda decisiones verificadas, recupera contexto y evita que Kika repita trabajo.",
+      "capabilities": ["memoria", "busqueda_semantica", "trazabilidad"],
+      "requires_approval": ["memory_delete"]
+    },
+    {
+      "id": "systems-sre",
+      "name": "SRE de Sistemas",
+      "runtime": "opencode",
+      "role": "Supervisa procesos, recursos, puertos, registros y recuperación de servicios.",
+      "capabilities": ["systemd", "observabilidad", "recuperacion"],
+      "requires_approval": ["firewall_change", "service_stop"]
+    },
+    {
+      "id": "security-auditor",
+      "name": "Auditora de Seguridad",
+      "runtime": "pi",
+      "role": "Evalúa exposición, permisos, secretos y configuraciones antes de cambios sensibles.",
+      "capabilities": ["seguridad", "permisos", "revision"],
+      "requires_approval": ["credential_change", "external_publish"]
+    },
+    {
+      "id": "qa-verifier",
+      "name": "Verificadora QA",
+      "runtime": "opencode",
+      "role": "Diseña y ejecuta validaciones; rechaza conclusiones sin evidencia de prueba.",
+      "capabilities": ["qa", "pruebas", "validacion"],
+      "requires_approval": []
+    },
+    {
+      "id": "repository-guardian",
+      "name": "Guardiana de Repositorios",
+      "runtime": "opencode",
+      "role": "Controla estado Git, cambios pendientes, ramas, commits y trazabilidad de código.",
+      "capabilities": ["git", "versionado", "revision"],
+      "requires_approval": ["git_push", "history_rewrite"]
+    },
+    {
+      "id": "web-architect",
+      "name": "Arquitecta Web",
+      "runtime": "opencode",
+      "role": "Diseña arquitectura de aplicaciones web, APIs, componentes y despliegues.",
+      "capabilities": ["web", "api", "arquitectura"],
+      "requires_approval": ["production_deploy"]
+    },
+    {
+      "id": "backend-engineer",
+      "name": "Ingeniera Backend",
+      "runtime": "opencode",
+      "role": "Implementa servicios, integraciones, lógica de negocio y pruebas del servidor.",
+      "capabilities": ["backend", "python", "integraciones"],
+      "requires_approval": ["database_migration", "production_deploy"]
+    },
+    {
+      "id": "frontend-engineer",
+      "name": "Ingeniera Frontend",
+      "runtime": "opencode",
+      "role": "Implementa interfaces accesibles, responsivas y consistentes con la marca.",
+      "capabilities": ["frontend", "ux", "react"],
+      "requires_approval": ["production_deploy"]
+    },
+    {
+      "id": "mobile-engineer",
+      "name": "Ingeniera Móvil",
+      "runtime": "opencode",
+      "role": "Trabaja en aplicaciones iOS, Android, React Native y puentes con dispositivos.",
+      "capabilities": ["movil", "ios", "react_native"],
+      "requires_approval": ["store_publish", "production_deploy"]
+    },
+    {
+      "id": "database-steward",
+      "name": "Custodia de Datos",
+      "runtime": "opencode",
+      "role": "Revisa esquemas, salud de bases de datos, respaldos y migraciones seguras.",
+      "capabilities": ["postgres", "datos", "backup"],
+      "requires_approval": ["database_migration", "data_delete"]
+    },
+    {
+      "id": "devops-release",
+      "name": "Ingeniera DevOps",
+      "runtime": "opencode",
+      "role": "Gestiona Docker, Nginx, certificados, despliegues y reversión controlada.",
+      "capabilities": ["docker", "nginx", "release"],
+      "requires_approval": ["production_deploy", "firewall_change"]
+    },
+    {
+      "id": "researcher",
+      "name": "Investigadora",
+      "runtime": "pi",
+      "role": "Formula investigación verificable, contrasta fuentes y documenta incertidumbres.",
+      "capabilities": ["investigacion", "fuentes", "sintesis"],
+      "requires_approval": ["external_publish"]
+    },
+    {
+      "id": "documentation-writer",
+      "name": "Documentalista Técnica",
+      "runtime": "opencode",
+      "role": "Mantiene documentación de arquitectura, operación, cambios y recuperación.",
+      "capabilities": ["documentacion", "runbooks", "reportes"],
+      "requires_approval": ["external_publish"]
+    },
+    {
+      "id": "product-analyst",
+      "name": "Analista de Producto",
+      "runtime": "pi",
+      "role": "Traduce objetivos de negocio a requisitos, métricas y prioridades ejecutables.",
+      "capabilities": ["producto", "requisitos", "priorizacion"],
+      "requires_approval": ["external_publish"]
+    },
+    {
+      "id": "integration-specialist",
+      "name": "Especialista de Integraciones",
+      "runtime": "opencode",
+      "role": "Diseña conexiones entre APIs, MCP, webhooks, aplicaciones y servicios privados.",
+      "capabilities": ["api", "mcp", "webhooks"],
+      "requires_approval": ["credential_change", "external_publish"]
+    },
+    {
+      "id": "automation-engineer",
+      "name": "Ingeniera de Automatización",
+      "runtime": "opencode",
+      "role": "Diseña automatizaciones idempotentes, monitoreables y con recuperación segura.",
+      "capabilities": ["automatizacion", "workers", "systemd"],
+      "requires_approval": ["service_stop", "production_deploy"]
+    },
+    {
+      "id": "ux-reviewer",
+      "name": "Revisora UX",
+      "runtime": "pi",
+      "role": "Evalúa claridad, accesibilidad y experiencia antes de entregar interfaces al usuario.",
+      "capabilities": ["ux", "accesibilidad", "revision"],
+      "requires_approval": []
+    },
+    {
+      "id": "incident-responder",
+      "name": "Respondedora de Incidentes",
+      "runtime": "opencode",
+      "role": "Clasifica incidentes, preserva evidencia, propone contención y documenta la recuperación.",
+      "capabilities": ["incidentes", "logs", "recuperacion"],
+      "requires_approval": ["service_stop", "firewall_change", "data_delete"]
+    }
+  ]
+}

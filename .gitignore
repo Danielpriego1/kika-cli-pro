@@ -1,0 +1,12 @@
+# Estado operativo y resultados generados en el VPS
+runtime/
+logs/*.log
+backups/
+
+# Artefactos de Python
+__pycache__/
+*.py[cod]
+
+# Secretos y configuraciones locales
+.env
+*.env
