@@ -18,7 +18,8 @@ import sys
 import urllib.error
 import urllib.request
 
-API_URL = "http://127.0.0.1:7488/dispatch"
+MOBILE_QUERY_URL = "http://127.0.0.1:7488/mobile/query"
+DISPATCH_URL = "http://127.0.0.1:7488/dispatch"
 MAX_ORDER_LENGTH = 1500
 BASE64URL = re.compile(r"^[A-Za-z0-9_-]+={0,2}$")
 
@@ -32,6 +33,16 @@ def validate_order(order: str) -> str:
     order = order.strip()
     if not order or len(order) > MAX_ORDER_LENGTH or any(ord(char) < 32 and char not in "\n\t" for char in order):
         reply({"ok": False, "error": "La orden está vacía o excede los límites permitidos."}, 64)
+    # Shortcuts can accidentally pass rich-text metadata from a deleted action.
+    # Reject it explicitly instead of creating a meaningless approval job.
+    if order.startswith("{\\rtf") or "\\cocoatextscaling" in order:
+        reply(
+            {
+                "ok": False,
+                "error": "El Atajo envió texto técnico de una acción anterior. En la acción SSH, selecciona como Entrada la salida de Solicitar texto.",
+            },
+            64,
+        )
     return order
 
 
@@ -57,14 +68,9 @@ def decode_order(command: str) -> str:
         reply({"ok": False, "error": "No se pudo decodificar la orden."}, 64)
 
 
-def submit(order: str) -> None:
-    payload = {
-        "agent_id": "kika-coordinator",
-        "objective": "Orden recibida desde iPhone: " + order,
-        "context": "Canal: Atajo Kika Message mediante SSH restringido. La orden debe seguir las reglas de aprobación del registro de agentes.",
-    }
+def post_json(url: str, payload: dict) -> dict:
     request = urllib.request.Request(
-        API_URL,
+        url,
         data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
         headers={"Content-Type": "application/json", "Accept": "application/json"},
         method="POST",
@@ -78,14 +84,40 @@ def submit(order: str) -> None:
         reply({"ok": False, "error": "Kika no respondió. Revisa el servicio."}, 70)
     except json.JSONDecodeError:
         reply({"ok": False, "error": "Respuesta inválida de Kika."}, 70)
+    if not isinstance(body, dict):
+        reply({"ok": False, "error": "Respuesta inválida de Kika."}, 70)
+    return body
 
+
+def submit(order: str) -> None:
+    query_result = post_json(MOBILE_QUERY_URL, {"query": order})
+    if query_result.get("handled"):
+        reply(
+            {
+                "ok": True,
+                "message": query_result.get("message", "Consulta completada."),
+                "status": query_result.get("status", "completed"),
+                "kind": "read_only_query",
+                "data": query_result.get("data", {}),
+            }
+        )
+
+    dispatch_result = post_json(
+        DISPATCH_URL,
+        {
+            "agent_id": "kika-coordinator",
+            "objective": "Orden recibida desde iPhone: " + order,
+            "context": "Canal: Atajo Kika Message mediante SSH restringido. La orden debe seguir las reglas de aprobación del registro de agentes.",
+        },
+    )
     reply(
         {
             "ok": True,
-            "message": "Orden recibida por Kika.",
-            "job_id": body.get("job_id"),
-            "status": body.get("status"),
-            "agent": body.get("agent", {}).get("name", "Kika Coordinadora"),
+            "message": "Orden recibida por Kika; requiere revisión antes de ejecutarse.",
+            "job_id": dispatch_result.get("job_id"),
+            "status": dispatch_result.get("status"),
+            "kind": "approval_queue",
+            "agent": dispatch_result.get("agent", {}).get("name", "Kika Coordinadora"),
         }
     )
 

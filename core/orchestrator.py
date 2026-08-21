@@ -31,7 +31,7 @@ QUEUE_DIR = RUNTIME_DIR / "queue"
 LOG_DIR = PROJECT_ROOT / "logs"
 PROJECT_NAME = os.getenv("KIKA_ENGRAM_PROJECT", "kika-cli-pro")
 ENGRAM_BIN = os.getenv("ENGRAM_BIN", "/usr/local/bin/engram")
-EXPECTED_AGENT_COUNT = 22
+DEFAULT_MINIMUM_AGENT_COUNT = 1
 
 
 class KikaError(RuntimeError):
@@ -54,13 +54,30 @@ class KikaOrchestrator:
         with REGISTRY_PATH.open("r", encoding="utf-8") as source:
             registry = json.load(source)
         agents = registry.get("agents", [])
+        policy = registry.get("registry_policy", {})
+        if not isinstance(agents, list) or not isinstance(policy, dict):
+            raise KikaError("El registro de agentes o su política no tiene el formato esperado.")
+        minimum_profiles = policy.get("minimum_profiles", DEFAULT_MINIMUM_AGENT_COUNT)
+        allowed_runtimes = policy.get("allowed_runtimes", ["engram", "gga", "opencode", "pi"])
+        if not isinstance(minimum_profiles, int) or minimum_profiles < 1:
+            raise KikaError("registry_policy.minimum_profiles debe ser un entero positivo.")
+        if not isinstance(allowed_runtimes, list) or not all(isinstance(item, str) and item for item in allowed_runtimes):
+            raise KikaError("registry_policy.allowed_runtimes no es válido.")
         ids = [agent.get("id") for agent in agents]
-        if len(agents) != EXPECTED_AGENT_COUNT:
+        if len(agents) < minimum_profiles:
             raise KikaError(
-                f"El registro debe tener {EXPECTED_AGENT_COUNT} agentes; contiene {len(agents)}."
+                f"El registro requiere al menos {minimum_profiles} perfiles; contiene {len(agents)}."
             )
         if len(ids) != len(set(ids)) or not all(ids):
             raise KikaError("El registro de agentes contiene identificadores vacíos o repetidos.")
+        invalid_runtimes = [agent.get("runtime") for agent in agents if agent.get("runtime") not in allowed_runtimes]
+        if invalid_runtimes:
+            raise KikaError("El registro contiene runtimes no autorizados: " + ", ".join(sorted(set(invalid_runtimes))))
+        registry["registry_policy"] = {
+            "minimum_profiles": minimum_profiles,
+            "allow_expansion": bool(policy.get("allow_expansion", True)),
+            "allowed_runtimes": allowed_runtimes,
+        }
         return registry
 
     @staticmethod
@@ -137,18 +154,92 @@ class KikaOrchestrator:
         agent_statuses = self.agent_statuses()
         available_agents = sum(1 for agent in agent_statuses if agent["available"])
         engram = self._engram_health()
+        registry_count = len(agent_statuses)
+        minimum_profiles = self.registry["registry_policy"]["minimum_profiles"]
         result = {
             "service": "kika-ai",
             "project": PROJECT_NAME,
             "timestamp": self._now(),
-            "registry_agents": len(agent_statuses),
+            "registry_agents": registry_count,
+            "minimum_agent_profiles": minimum_profiles,
             "available_agent_profiles": available_agents,
             "engram": engram,
             "queue_pending": len(list(QUEUE_DIR.glob("*.json"))),
-            "status": "healthy" if engram["ok"] and available_agents == EXPECTED_AGENT_COUNT else "degraded",
+            "status": "healthy" if engram["ok"] and registry_count >= minimum_profiles and available_agents == registry_count else "degraded",
         }
         self._write_runtime_state(result)
         return result
+
+    def mobile_query(self, query: str) -> dict[str, Any]:
+        """Answer a strictly allowlisted read-only mobile query.
+
+        This method only exposes operational health, agent availability, Engram
+        state and queue depth. It never runs user-supplied shell commands and
+        leaves non-allowlisted requests to the existing approval queue.
+        """
+        clean_query = self._safe_text(query, "query", 1500)
+        normalized = clean_query.casefold()
+        health = self.health()
+        engram_ok = health["engram"]["ok"]
+
+        if any(term in normalized for term in ("agente", "agentes", "perfil", "perfiles")):
+            return {
+                "ok": True,
+                "handled": True,
+                "status": "completed",
+                "message": (
+                    f"Kika tiene {health['available_agent_profiles']} de {health['registry_agents']} "
+                    "perfiles especializados disponibles."
+                ),
+                "data": {
+                    "available_agent_profiles": health["available_agent_profiles"],
+                    "registry_agents": health["registry_agents"],
+                },
+            }
+        if any(term in normalized for term in ("engram", "memoria", "memorias")):
+            return {
+                "ok": True,
+                "handled": True,
+                "status": "completed",
+                "message": (
+                    "La memoria semántica Engram está sana y disponible."
+                    if engram_ok
+                    else "Engram necesita revisión; Kika reporta un estado degradado."
+                ),
+                "data": {"engram_ok": engram_ok, "project": PROJECT_NAME},
+            }
+        if any(term in normalized for term in ("cola", "colas", "trabajo", "trabajos", "pendiente", "pendientes")):
+            return {
+                "ok": True,
+                "handled": True,
+                "status": "completed",
+                "message": f"Kika tiene {health['queue_pending']} trabajo(s) pendiente(s) de revisión.",
+                "data": {"queue_pending": health["queue_pending"]},
+            }
+        if any(term in normalized for term in ("estado", "status", "salud", "health", "lista", "listo", "conectada")):
+            return {
+                "ok": True,
+                "handled": True,
+                "status": "completed",
+                "message": (
+                    f"Kika está {health['status']}; Engram está "
+                    f"{'sano' if engram_ok else 'degradado'} y hay "
+                    f"{health['available_agent_profiles']} de {health['registry_agents']} perfiles disponibles."
+                ),
+                "data": {
+                    "service_status": health["status"],
+                    "engram_ok": engram_ok,
+                    "available_agent_profiles": health["available_agent_profiles"],
+                    "registry_agents": health["registry_agents"],
+                    "queue_pending": health["queue_pending"],
+                },
+            }
+        return {
+            "ok": True,
+            "handled": False,
+            "status": "requires_approval",
+            "message": "La orden requiere revisión o una habilidad especializada antes de ejecutarse.",
+        }
 
     def _write_runtime_state(self, state: dict[str, Any]) -> None:
         state_path = RUNTIME_DIR / "status.json"
@@ -268,6 +359,8 @@ class KikaRequestHandler(BaseHTTPRequestHandler):
                 )
             elif self.path == "/memory/search":
                 result = self.orchestrator.search_memory(body.get("query", ""), body.get("limit", 8))
+            elif self.path == "/mobile/query":
+                result = self.orchestrator.mobile_query(body.get("query", ""))
             elif self.path == "/dispatch":
                 result = self.orchestrator.queue_delegation(
                     body.get("agent_id", ""), body.get("objective", ""), body.get("context", "")

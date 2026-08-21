@@ -1,8 +1,13 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "orchestrator": "kika-ai",
   "project": "kika-cli-pro",
-  "description": "Registro operativo de los 22 perfiles especializados coordinados por Kika-AI.",
+  "description": "Registro extensible de perfiles especializados coordinados por Kika-AI.",
+  "registry_policy": {
+    "minimum_profiles": 22,
+    "allow_expansion": true,
+    "allowed_runtimes": ["engram", "gga", "opencode", "pi"]
+  },
   "agents": [
     {
       "id": "kika-coordinator",
@@ -179,6 +184,86 @@
       "role": "Clasifica incidentes, preserva evidencia, propone contención y documenta la recuperación.",
       "capabilities": ["incidentes", "logs", "recuperacion"],
       "requires_approval": ["service_stop", "firewall_change", "data_delete"]
+    },
+    {
+      "id": "vps-sentinel",
+      "name": "Centinela VPS",
+      "runtime": "opencode",
+      "role": "Observa salud de servicios, carga, disco, memoria y puertos sin realizar cambios.",
+      "capabilities": ["vps", "observabilidad", "solo_lectura"],
+      "requires_approval": []
+    },
+    {
+      "id": "network-exposure-reviewer",
+      "name": "Revisora de Exposición de Red",
+      "runtime": "pi",
+      "role": "Analiza superficies expuestas, reglas de red y riesgos de acceso antes de recomendar cambios.",
+      "capabilities": ["red", "seguridad", "analisis_de_riesgo"],
+      "requires_approval": ["firewall_change", "port_exposure"]
+    },
+    {
+      "id": "release-manager",
+      "name": "Gestora de Releases",
+      "runtime": "opencode",
+      "role": "Prepara versiones reproducibles, notas de cambio, pruebas previas y reversión documentada.",
+      "capabilities": ["release", "git", "rollback"],
+      "requires_approval": ["git_push", "production_deploy"]
+    },
+    {
+      "id": "recovery-planner",
+      "name": "Planificadora de Recuperación",
+      "runtime": "pi",
+      "role": "Diseña recuperación ante fallas, prioriza dependencias y valida rutas de restauración sin ejecutar restauraciones.",
+      "capabilities": ["recuperacion", "continuidad", "planificacion"],
+      "requires_approval": ["restore_backup", "service_stop"]
+    },
+    {
+      "id": "engram-curator",
+      "name": "Curadora Engram",
+      "runtime": "engram",
+      "role": "Revisa calidad, duplicación y recuperación de memoria semántica, preservando trazabilidad.",
+      "capabilities": ["engram", "memoria", "deduplicacion"],
+      "requires_approval": ["memory_delete"]
+    },
+    {
+      "id": "iphone-channel-steward",
+      "name": "Custodia del Canal iPhone",
+      "runtime": "opencode",
+      "role": "Verifica el Atajo Kika Message, autenticación SSH restringida y respuestas móviles sin alterar credenciales.",
+      "capabilities": ["ios", "atajos", "ssh"],
+      "requires_approval": ["credential_change", "mobile_key_rotation"]
+    },
+    {
+      "id": "learning-experience-designer",
+      "name": "Diseñadora de Aprendizaje",
+      "runtime": "pi",
+      "role": "Diseña rutas pedagógicas, pistas graduadas y criterios de aprendizaje para el Polyglot Coding Game.",
+      "capabilities": ["educacion", "game_design", "contenido"],
+      "requires_approval": ["external_publish"]
+    },
+    {
+      "id": "grupo-psi-qa-analyst",
+      "name": "Analista QA Grupo PSI",
+      "runtime": "opencode",
+      "role": "Diseña pruebas reproducibles para flujos de Grupo PSI y reporta incidencias con evidencia.",
+      "capabilities": ["grupo_psi", "qa", "pruebas"],
+      "requires_approval": []
+    },
+    {
+      "id": "capacity-analyst",
+      "name": "Analista de Capacidad",
+      "runtime": "opencode",
+      "role": "Analiza tendencias de CPU, memoria, disco y contenedores para anticipar límites operativos.",
+      "capabilities": ["capacidad", "metricas", "planeacion"],
+      "requires_approval": []
+    },
+    {
+      "id": "change-control-coordinator",
+      "name": "Coordinadora de Control de Cambios",
+      "runtime": "gga",
+      "role": "Ordena cambios por riesgo, dependencias, evidencias de prueba y aprobación requerida.",
+      "capabilities": ["cambios", "riesgo", "aprobaciones"],
+      "requires_approval": ["production_deploy", "credential_change", "data_delete"]
     }
   ]
 }
